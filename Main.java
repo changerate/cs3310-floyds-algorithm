@@ -27,14 +27,11 @@ public class Main {
      * @param args
      *********************************************************/
     public static void main(String[] args) {
-
-        
         String filename = "inputA"; // class file 
         if (args.length != 0)
             filename = args[0];
         
         DijkstrasClass dijClass = new DijkstrasClass(filename);
-
-        System.out.println("\n--------------------------------------------------------------------------");
+        System.out.println("\n-------------------------------------------------");
     }
 }

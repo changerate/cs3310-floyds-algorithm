@@ -14,7 +14,4 @@ class Edge {
         this.to = to;
         this.weight = weight;
     }
-
-    public int getTo() { return to; }
-    public int getWeight() { return weight; }
 }

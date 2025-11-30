@@ -24,10 +24,10 @@ import java.util.Set;
 
 public class DijkstrasClass {
     private int[][] graph2DArray; // the 2d array to hold the distances between each node 
-    private int[][] optimalCosts; // the 2d array to hold the optimal costs between each node 
     private String filename;
     private int numNodes;
     private List<List<Edge>> graph = new ArrayList<>();
+    private List<List<int[]>> distAndParents = new ArrayList<>();
 
 
 
@@ -36,34 +36,33 @@ public class DijkstrasClass {
         setFilename(inputFilename);
         readFile(); // initialize information needed 
         // printGraph();
-        buildOptimalCosts();
+        applyDijkstras();
+        printDistAndParents();
     }
     
 
-    private void buildOptimalCosts() { 
-        // // initialize optimal cost 2d array 
-        // optimalCosts = new int[numNodes][numNodes];
-        
+
+
+    private void applyDijkstras() { 
         // for each row (source node), find the optimal cost to the next node 
         for (int srcNode = 0; srcNode < numNodes-1; srcNode++) { 
-            dijkstrasAlgorithm(srcNode);
+            List<int[]> distAndParentsOneRow = dijkstrasAlgorithm(srcNode);
+            distAndParents.add(distAndParentsOneRow);
         }
     }
 
-
-
-
-    private void dijkstrasAlgorithm(int srcNode) {
-        int[] dist = new int[numNodes];      // shortest distances found so far
-        boolean[] visited = new boolean[numNodes]; // processed or not
-        int[] parent = new int[numNodes];    // to reconstruct path (optional)
+    private List<int[]> dijkstrasAlgorithm(int srcNode) {
+        Node src = new Node(srcNode, 0);        // make a new Node object with the srcNode integer
+        int[] dist = new int[numNodes];             // shortest distances found so far
+        boolean[] visited = new boolean[numNodes];  // processed or not
+        int[] parent = new int[numNodes];           // to reconstruct path (optional)
         PriorityQueue<Node> pq = new PriorityQueue<>();
 
         // initialization
         Arrays.fill(dist, Integer.MAX_VALUE);
         Arrays.fill(parent, -1);
-        dist[srcNode] = 0;
-        pq.add(new Node(srcNode, 0));
+        dist[src.id] = 0;
+        pq.add(src);
 
         while (!pq.isEmpty()) {
             Node cur = pq.poll();
@@ -73,7 +72,7 @@ public class DijkstrasClass {
             if (visited[u]) continue;
             visited[u] = true;
 
-            // For each neighbor v of u
+            // Get each neighbor of the current node
             for (Edge e : graph.get(u)) {
                 int v = e.to;
                 int w = e.weight;
@@ -86,7 +85,16 @@ public class DijkstrasClass {
                 }
             }
         }
+
+        
+        List<int[]> ret = new ArrayList<>();
+        ret.add(dist);
+        ret.add(parent);
+        
+        return ret;
     }
+
+
 
 
 
@@ -132,25 +140,52 @@ public class DijkstrasClass {
 
 
     
-    //**********************************************/
+    //***************************************************************************/
     // UTILITIES 
-    //**********************************************/
+    //***************************************************************************/
     public void printGraph() { 
         for (int src = 0; src < numNodes; src++) {
             System.out.println("The list for source " + Integer.toString(src) + ": ");
             for (Edge e : graph.get(src)) {
-                System.out.println("to: " + e.getTo() + ", weight: " + e.getWeight());
+                System.out.println("to: " + e.to + ", weight: " + e.weight);
             }
         }
     }
     
-    
+
+    public void printIntArray(int[] arr) {
+        for (int i = 0; i < arr.length; i++) {
+            System.out.print(arr[i] + ",");
+        }
+    }
 
 
-    
-    //**********************************************/
+    public void printBoolArray(boolean[] arr) {
+        for (int i = 0; i < arr.length; i++) {
+            System.out.print(arr[i] + ",");
+        }
+    }
+
+
+    public void printDistAndParents() {
+        for (int i = 0; i < distAndParents.size(); i++) {
+            System.out.println("Source node " + i + ":");
+            List<int[]> innerList = distAndParents.get(i);
+            for (int j = 0; j < innerList.size(); j++) {
+                int[] arr = innerList.get(j);
+                
+                if (j == 0)
+                    System.out.println("\tOptimal dist:   " + Arrays.toString(arr));
+                else
+                    System.out.println("\tParents source: " + Arrays.toString(arr));
+            }
+            System.out.println();
+        }
+    }
+
+    //***************************************************************************/
     // SETTERS 
-    //**********************************************/
+    //***************************************************************************/
     private void setFilename(String inputFilename) { 
         filename = inputFilename;
     }
