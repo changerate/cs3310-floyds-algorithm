@@ -21,6 +21,7 @@ import java.util.PriorityQueue;
 
 
 
+
 public class DijkstrasClass {
     private int[][] graph2DArray; // the 2d array to hold the distances between each node 
     private String filename;
@@ -38,7 +39,7 @@ public class DijkstrasClass {
         applyDijkstras();
         // printDistAndParents();
     }
-    
+
 
 
 
@@ -85,28 +86,26 @@ public class DijkstrasClass {
             }
         }
 
-        
         List<int[]> ret = new ArrayList<>();
         ret.add(dist);
         ret.add(parent);
-        
+
         return ret;
     }
 
 
 
 
-
     private void readFile() {
         int row = 0;
-    
+
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (row == 0) { 
                     // get the number of nodes (posts) in this graph (river)
                     // initialize a 2D array of distances 
-                    setNumNodes(Integer.parseInt(line)); 
+                    setNumNodes(Integer.parseInt(line.trim())); 
                     graph2DArray = new int[numNodes][numNodes]; 
                     for (int i = 0; i < graph2DArray.length; i++) {
                         // now initialize all the values to -1:
@@ -137,22 +136,21 @@ public class DijkstrasClass {
 
 
 
-
     public void printOptimalRouteInfo(int u, int v) { 
         if (u > numNodes || v > numNodes) {
             System.out.println("u or v is not a node.");
             return;
         }
-        
+
         int optimalDistance = distAndParents.get(u).get(0)[v];
         int[] parents = distAndParents.get(u).get(1); // get the list of parents TO node u
         int parent = v;
 
         Deque<Integer> stack = new ArrayDeque<>();
-        
+
         int i = 0;
         for (; i < parents.length; i++) {
-            stack.push(parent);    
+            stack.push(parent);
             if (parents[parent] != -1) { 
                 parent = parents[parent];
             } else {
@@ -173,6 +171,7 @@ public class DijkstrasClass {
 
 
 
+
     //***************************************************************************/
     // UTILITIES 
     //***************************************************************************/
@@ -188,7 +187,7 @@ public class DijkstrasClass {
 
     public void printOptimalGraph() { 
         System.out.println("\nOptimal Cost Matrix");
-        
+
         System.out.print(" ");
 
         for (int i = 0; i < numNodes; i++) {
@@ -219,7 +218,6 @@ public class DijkstrasClass {
 
 
 
-    
 
     public void printIntArray(int[] arr) {
         for (int i = 0; i < arr.length; i++) {
@@ -229,7 +227,7 @@ public class DijkstrasClass {
     }
 
 
-    
+
 
     public void printBoolArray(boolean[] arr) {
         for (int i = 0; i < arr.length; i++) {
@@ -237,7 +235,6 @@ public class DijkstrasClass {
         }
         System.out.println();
     }
-
 
 
 
@@ -250,7 +247,7 @@ public class DijkstrasClass {
             List<int[]> innerList = distAndParents.get(i);
             for (int j = 0; j < innerList.size(); j++) {
                 int[] arr = innerList.get(j);
-                
+
                 if (j == 0)
                     System.out.println("\tOptimal dist:   " + Arrays.toString(arr));
                 else
@@ -261,7 +258,6 @@ public class DijkstrasClass {
 
         System.out.println("----------------------------");
     }
-
 
 
 
