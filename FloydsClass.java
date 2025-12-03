@@ -34,7 +34,6 @@ public class FloydsClass {
         setFilename(inputFilename);
         readFile(); // initialize information needed 
         floydsAlgorithm();
-        printGraphMatrix(shortestPaths);
     }
 
 
@@ -43,7 +42,6 @@ public class FloydsClass {
 
     private void floydsAlgorithm() {
         int[][] shortestPaths = graphMatrix;
-        // printGraphMatrix(shortestPaths);
         
         for (int k = 0; k < graphMatrix.length; k++) { 
             for (int i = 0; i < graphMatrix.length; i++) { 
@@ -187,10 +185,10 @@ public class FloydsClass {
     }
 
 
-    public void printGraphMatrix() {
+    public void printShortestPaths() {
         // First find the widest number (in characters)
         int maxWidth = 0;
-        for (int[] row : graphMatrix) {
+        for (int[] row : shortestPaths) {
             for (int val : row) {
                 if (val != -1) {                       // ignore "no edge" entries
                     int width = String.valueOf(val).length();
@@ -200,7 +198,7 @@ public class FloydsClass {
         }
 
         // Print each row using padding
-        for (int[] row : graphMatrix) {
+        for (int[] row : shortestPaths) {
             for (int val : row) {
                 if (val == -1) {
                     // print blank representing no path
@@ -215,7 +213,7 @@ public class FloydsClass {
     }
 
 
-    public void printGraphMatrix(int[][] arr) {
+    public void printMatrix(int[][] arr) {
         // First find the widest number (in characters)
         int maxWidth = 0;
         for (int[] row : arr) {
