@@ -29,3 +29,5 @@ This is the abstract class that holds all the functionality that can be used acr
 This class uses the method of finding the product of the string using primes. This uses the AnagramsClass.
 ### 4. Anagrams Sorted String Hash
 This class demonstrates the method of finding the sorted string in order to make the hash and to build the anagram sets. 
+
+
