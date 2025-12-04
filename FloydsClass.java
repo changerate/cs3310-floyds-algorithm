@@ -6,10 +6,7 @@
  * ------------------------------------------------------------
  * File: FloydsClass.java
  * TODO: FILL OUT THE COMMENTS TO FIT FLOYDS
- * Purpose: this class loads a weighted directed 
- * graph from an input file, constructs a 2D distance matrix, 
- * and applies Floyd's algorithm to compute the optimal 
- * shortest-path matrix.
+ * Purpose: 
  **************************************************************/
 
 
@@ -29,11 +26,17 @@ public class FloydsClass {
     private int[][] graphMatrix; // the 2d array representing the actual graph
     private int[][] shortestPaths; // the 2d array representing the optimal paths 
     private int[][] parentsMatrix; // the 2d array representing the parents for path reconstruction
-    private static final int INF = 1_000_000_000; // "Infinity" (large enough)
 
 
 
-
+    /*********************************************************
+     * Constructor FloydsClass; initializes the class by
+     * loading the graph from the given filename and running
+     * Floyd’s shortest–path algorithm on it.
+     *
+     * @param inputFilename the name of the file containing
+     *        the graph’s adjacency information
+     *********************************************************/
     public FloydsClass(String inputFilename) { 
         setFilename(inputFilename);
         readFile(); // initialize information needed 
@@ -43,15 +46,27 @@ public class FloydsClass {
 
 
 
-    private void floydsAlgorithm() {
-        int[][] dist = deepCopy(graphMatrix);
-        int n = dist.length;
 
+    /*********************************************************
+     * Function floydsAlgorithm; executes the Floyd
+     * algorithm to compute the shortest paths between all 
+     * pairs of nodes in the graph.
+     *
+     * This method:
+     *   - Initializes the parents matrix for path reconstruction
+     *   - Iteratively improves path costs using intermediate nodes
+     *
+     * Results are stored in shortestPaths and parentsMatrix.
+     *********************************************************/
+    private void floydsAlgorithm() {
+        shortestPaths = deepCopy(graphMatrix);
+        int n = shortestPaths.length;
+        
         // Initialize parentsMatrix
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
 
-                if (dist[i][j] != -1 && i != j) {
+                if (shortestPaths[i][j] != -1 && i != j) {
                     // There is a direct edge i -> j, so the next node from i to j is j
                     parentsMatrix[i][j] = j;
                 } else {
@@ -65,42 +80,38 @@ public class FloydsClass {
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
                     // Skip if i can't reach k or k can't reach j
-                    if (dist[i][k] == -1 || dist[k][j] == -1) continue;
+                    if (shortestPaths[i][k] == -1 || shortestPaths[k][j] == -1) continue;
 
-                    int ikjDist = dist[i][k] + dist[k][j];
-                    if (ikjDist < dist[i][j]) {
-                        dist[i][j] = ikjDist;
+                    int ikjDist = shortestPaths[i][k] + shortestPaths[k][j];
+                    if (ikjDist < shortestPaths[i][j]) {
+                        shortestPaths[i][j] = ikjDist;
                         parentsMatrix[i][j] = parentsMatrix[i][k];
                     }
                 }
             }
         }
-
-        setShortestPaths(dist);
     }
 
 
 
-
+        
     /*********************************************************
-     * Function readFile; reads the graph data from the input 
-     * file specified by filename. The first line contains the 
-     * number of nodes, and each subsequent line contains the 
-     * upper-triangular portion of the adjacency matrix. The 
-     * method initializes both a 2D distance matrix and an 
-     * adjacency list representation of the graph.
+     * Function readFile; loads the graph data from the input
+     * file specified by 'filename'. The first line contains the
+     * number of nodes, and subsequent lines contain the upper
+     * triangular distance entries of the adjacency matrix.
      *
-     * File format:
-     *   Line 1: numNodes
-     *   Line 2+: distances from node i to all nodes j ≥ i
-     *
-     * @throws IOException if the input file cannot be read
+     * This method:
+     *   - Initializes graphMatrix and parentsMatrix
+     *   - Fills matrix entries with either a distance or -1
+     *   - Handles file-reading exceptions gracefully
      *********************************************************/
     private void readFile() {
         int row = 0;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             String line;
+
             while ((line = reader.readLine()) != null) {
                 if (row == 0) { 
                     // get the number of nodes (posts) in this graph (river)
@@ -116,7 +127,7 @@ public class FloydsClass {
                         Arrays.fill(parentsMatrix[i], -1);   
                     }
                 } else { 
-                    // collect the distances of the nodes in the adjacency list graph
+                    // collect the distances of the nodes
                     String[] dists = line.trim().split("\\s+");   // split on one or more spaces
                     int distIndex = 0;
                     for (int i = row; i < numNodes; i++) {
@@ -127,6 +138,7 @@ public class FloydsClass {
                 }
                 row += 1; 
             }
+        
         } catch (IOException e) {
             System.out.println("\nError reading file: " + e);
             // return;
@@ -135,7 +147,39 @@ public class FloydsClass {
 
 
 
-    private void displayPath(int u, int v) { 
+    //=====================================================================
+    //=====================================================================
+    // UTILITIES 
+    //=====================================================================
+    //=====================================================================
+
+    /*********************************************************
+     * Function displayResults; prints the completed shortest
+     * path distance matrix and demonstrates a sample reconstructed
+     * path between nodes 1 and 3.
+     *********************************************************/
+    public void displayResults() { 
+        System.out.println("\nThe optimal cost matrix is as follows:");
+        printMatrix(shortestPaths);
+        
+        System.out.println("\nAn example path from 1 to 3:");
+        displayPath(1, 3);
+    }
+
+
+
+
+    /*********************************************************
+     * Function displayPath; reconstructs and prints the path
+     * from node u to node v using the parentsMatrix produced by
+     * Floyd’s algorithm.
+     *
+     * If no path exists, a message is displayed.
+     *
+     * @param u the starting node
+     * @param v the target node
+     *********************************************************/
+    public void displayPath(int u, int v) { 
         Deque<Integer> recontructedPath = new ArrayDeque<>();
         recontructedPath.add(u);
         int k = parentsMatrix[u][v];
@@ -161,59 +205,14 @@ public class FloydsClass {
 
 
 
-
-
-
-    //=====================================================================
-    //=====================================================================
-    // UTILITIES 
-    //=====================================================================
-    //=====================================================================
-
-
     /*********************************************************
-     * Function printIntArray; prints the contents of an integer 
-     * array in comma-separated format.
+     * Function printMatrix; prints a formatted 2D matrix of
+     * distances. The method auto-aligns columns based on the
+     * widest numeric entry and prints blanks for -1 entries.
      *
-     * @param arr the array to print
+     * @param arr the matrix to display
      *********************************************************/
-    public void printIntArray(int[] arr) {
-        for (int i = 0; i < arr.length; i++) {
-            System.out.print(arr[i] + ",");
-        }
-        System.out.println();
-    }
-
-
-    public void printShortestPaths() {
-        // First find the widest number (in characters)
-        int maxWidth = 0;
-        for (int[] row : shortestPaths) {
-            for (int val : row) {
-                if (val != -1) {                       // ignore "no edge" entries
-                    int width = String.valueOf(val).length();
-                    maxWidth = Math.max(maxWidth, width);
-                }
-            }
-        }
-
-        // Print each row using padding
-        for (int[] row : shortestPaths) {
-            for (int val : row) {
-                if (val == -1) {
-                    // print blank representing no path
-                    System.out.printf("%" + maxWidth + "s ", " ");
-                } else {
-                    System.out.printf("%" + maxWidth + "d ", val);
-                }
-            }
-            System.out.println();
-        }
-        System.out.println();
-    }
-
-
-    public void printMatrix(int[][] arr) {
+    private void printMatrix(int[][] arr) {
         // First find the widest number (in characters)
         int maxWidth = 0;
         for (int[] row : arr) {
@@ -257,6 +256,13 @@ public class FloydsClass {
 
 
 
+    /*********************************************************
+     * Function deepCopy; produces a deep copy of the 2D array
+     * passed as input. Each row is cloned individually.
+     *
+     * @param original the matrix to be copied
+     * @return a new 2D array with identical values
+     *********************************************************/
     public static int[][] deepCopy(int[][] original) {
         if (original == null) 
             return null;
@@ -271,18 +277,7 @@ public class FloydsClass {
     }
 
 
-    /*********************************************************
-     * Function printBoolArray; prints the contents of a boolean 
-     * array in comma-separated format.
-     *
-     * @param arr the boolean array to print
-     *********************************************************/
-    public void printBoolArray(boolean[] arr) {
-        for (int i = 0; i < arr.length; i++) {
-            System.out.print(arr[i] + ",");
-        }
-        System.out.println();
-    }
+
 
 
     //=====================================================================
@@ -290,6 +285,8 @@ public class FloydsClass {
     // SETTERS 
     //=====================================================================
     //=====================================================================
+
+
     /*********************************************************
      * Function setFilename; stores the input filename used to
      * read the graph data.
@@ -308,9 +305,5 @@ public class FloydsClass {
      *********************************************************/
     private void setNumNodes(int inputNum) { 
         numNodes = inputNum;
-    }
-
-    private void setShortestPaths(int[][] inputShortestPaths) { 
-        shortestPaths = inputShortestPaths;
     }
 }
