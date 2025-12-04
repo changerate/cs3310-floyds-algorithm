@@ -17,10 +17,6 @@ If you want to run your own matrix file just include it as an argument:
 ```
 java Main.java ./path/inputA
 ```
-If you want to run your own matrix file AND include posts to test right off the bat:
-```
-java Main.java ./path/inputA 0 1
-```
   
   
 ## Classes

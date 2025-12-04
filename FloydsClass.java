@@ -169,10 +169,27 @@ public class FloydsClass {
         System.out.println("\nThe optimal cost matrix is as follows:");
         printMatrix(shortestPaths);
         
-        System.out.println("\nAn example path from 1 to 3:");
-        displayPath(1, 3);
+        displayAllPaths();
     }
+    
+    
+    
+    
+    /*********************************************************
+     * Function displayAllPaths; This function simply displays 
+     * and formats all the paths in matrix.
+     *********************************************************/
+    public void displayAllPaths() { 
+        System.out.println("\nThese are all the paths in this matrix:");
 
+        for (int i = 0; i < numNodes; i++) { 
+            for (int j = 0; j < numNodes; j++) { 
+                if (graphMatrix[i][j] < 0) continue;
+                
+                displayPath(i, j);
+            }
+        }
+    }
 
 
 
@@ -260,6 +277,8 @@ public class FloydsClass {
         }
         System.out.println();
     }
+
+
 
 
 
