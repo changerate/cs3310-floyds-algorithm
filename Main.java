@@ -38,7 +38,7 @@ public class Main {
 
         // DijkstrasClass riverInstance = new DijkstrasClass(filename);
         FloydsClass riverInstance = new FloydsClass(filename);
-        // riverInstance.printOptimalGraph();
+        // riverInstance.printShortestPaths();
         
         // Now let the user test routes between posts 
         // testRoutes(riverInstance);
@@ -59,30 +59,32 @@ public class Main {
      * @param riverInstance a DijkstrasClass object that has 
      *        already computed all shortest-path information
      *********************************************************/
-    static void testRoutes(DijkstrasClass riverInstance) { 
-        int u = -1, v = -1;
-        boolean contin = true; 
-        Scanner sc = new Scanner(System.in);
+    // static void testRoutes(FloydsClass riverInstance) { 
+    //     int u = -1, v = -1;
+    //     boolean contin = true; 
+    //     Scanner sc = new Scanner(System.in);
 
-        while (contin) { 
-            System.out.print("\nTest another post-to-post cost (y/n)? ");
-            String line = sc.nextLine(); 
-            if ("n".equals(line.toLowerCase())) {
-                contin = false;
-            }
-            else if ("y".equals(line.toLowerCase())) {
-                try { 
-                    System.out.print("Choose the from and to posts, seperated by a space: ");
-                    line = sc.nextLine(); 
-                    String[] uv = line.trim().split("\\s+");
-                    u = Integer.parseInt(uv[0]);
-                    v = Integer.parseInt(uv[1]);
+    //     while (contin) { 
+    //         System.out.print("\nTest another post-to-post cost (y/n)? ");
+    //         String line = sc.nextLine(); 
+
+    //         if ("n".equals(line.toLowerCase())) {
+    //             contin = false;
+    //         }
+
+    //         else if ("y".equals(line.toLowerCase())) {
+    //             try { 
+    //                 System.out.print("Choose the from and to posts, seperated by a space: ");
+    //                 line = sc.nextLine(); 
+    //                 String[] uv = line.trim().split("\\s+");
+    //                 u = Integer.parseInt(uv[0]);
+    //                 v = Integer.parseInt(uv[1]);
                     
-                    riverInstance.printOptimalRouteInfo(u, v);
-                } catch (Exception e) { 
-                    System.out.println("Invalid post input: " + e);
-                }
-            }
-        }
-    }
+    //                 // riverInstance.printOptimalRouteInfo(u, v);
+    //             } catch (Exception e) { 
+    //                 System.out.println("Invalid post input: " + e);
+    //             }
+    //         }
+    //     }
+    // }
 }

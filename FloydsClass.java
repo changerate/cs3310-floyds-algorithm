@@ -16,24 +16,50 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.Queue;
 
 
 
 
 public class FloydsClass {
-    private String filename; // holds the filename where the original 2D array graph comes from
-    private int numNodes; // holds the total number of nodes in the original 2D array graph
-    private int[][] graphMatrix; // the 2d array to hold the distances between each node 
-    private int[][] shortestPaths;
+    private String filename; // filename of the original 2D array graph file
+    private int numNodes; // total number of nodes in the original graph
+    private int[][] graphMatrix; // the 2d array representing the actual graph
+    private int[][] shortestPaths; // the 2d array representing the optimal paths 
+    private int[][] parentsMatrix; // the 2d array representing the parents for path reconstruction
 
 
 
 
     public FloydsClass(String inputFilename) { 
+        System.out.println(); //TODO: DELETE
+
         setFilename(inputFilename);
         readFile(); // initialize information needed 
+
+        // System.out.println("The initialized parent matrix");
+        // printMatrix(parentsMatrix);
+
         floydsAlgorithm();
+        
+        System.out.println("The parent matrix after floyd's");
+        printMatrix(parentsMatrix);
+        // System.out.println("The graphMatrix after floyd's");
+        // printMatrix(graphMatrix);
+        System.out.println("The shortestPaths after floyd's");
+        printMatrix(shortestPaths);
+
+        System.out.println("The path");
+        for (int i = 0; i < parentsMatrix.length; i++) { 
+            for (int j = 0; j < parentsMatrix.length; j++) { 
+                displayPath(i, j);
+            }
+        }
+        
     }
 
 
@@ -41,21 +67,25 @@ public class FloydsClass {
     
 
     private void floydsAlgorithm() {
-        int[][] shortestPaths = graphMatrix;
+        int[][] shortestPaths = deepCopy(graphMatrix);
         
         for (int k = 0; k < graphMatrix.length; k++) { 
             for (int i = 0; i < graphMatrix.length; i++) { 
                 for (int j = 0; j < graphMatrix.length; j++) {
-                    if (shortestPaths[i][k] >= 0 && shortestPaths[k][j] >= 0) {
-                        int throughK = shortestPaths[i][k] + shortestPaths[k][j];
+                    int ijDist = shortestPaths[i][j];
+                    int ikDist = shortestPaths[i][k];
+                    int kjDist = shortestPaths[k][j];
 
-                        // Case 1: no path i -> j yet  → just set it
-                        if (shortestPaths[i][j] == -1) {
-                            shortestPaths[i][j] = throughK;
-                        }
-                        // Case 2: we found a shorter path
-                        else if (throughK < shortestPaths[i][j]) {
-                            shortestPaths[i][j] = throughK;
+                    if (ikDist >= 0 || kjDist >= 0) { 
+
+                        if (ijDist < ikDist + kjDist) {
+                            shortestPaths[i][j] = ijDist;
+                            parentsMatrix[i][j] = j;
+                        } else { 
+                            shortestPaths[i][j] = ikDist + kjDist;
+
+                            parentsMatrix[i][j] = k;
+                            parentsMatrix[k][j] = j;
                         }
                     }
                 }
@@ -90,12 +120,16 @@ public class FloydsClass {
             while ((line = reader.readLine()) != null) {
                 if (row == 0) { 
                     // get the number of nodes (posts) in this graph (river)
-                    // initialize a 2D array of distances 
                     setNumNodes(Integer.parseInt(line.trim())); 
+                    // initialize a 2D array of distances 
                     graphMatrix = new int[numNodes][numNodes]; 
+                    parentsMatrix = new int[numNodes][numNodes]; 
+                    // now initialize all the values to negative value:
                     for (int i = 0; i < graphMatrix.length; i++) {
-                        // now initialize all the values to negative value:
                         Arrays.fill(graphMatrix[i], -1);   
+                    }
+                    for (int i = 0; i < parentsMatrix.length; i++) {
+                        Arrays.fill(parentsMatrix[i], -1);   
                     }
                 } else { 
                     // collect the distances of the nodes in the adjacency list graph
@@ -117,49 +151,31 @@ public class FloydsClass {
 
 
 
+    private void displayPath(int u, int v) { 
+        Deque<Integer> recontructedPath = new ArrayDeque<>();
+        recontructedPath.add(u);
+        int k = parentsMatrix[u][v];
+        
+        while (k != v) {
+            if (k == -1) { 
+                System.out.println("No path exists from " + u + " to " + v);
+                return;
+            }
+            recontructedPath.add(k);
+            k = parentsMatrix[k][v];
+        }
+        recontructedPath.add(v);
 
-    /*********************************************************
-     * Function printOptimalRouteInfo; prints both the optimal 
-     * distance as an integer and the full shortest path from 
-     * source node u to destination node v. This method 
-     * reconstructs the path using the stored parent pointers
-     * and prints the path in order from source to destination.
-     *
-     * @param u the source node
-     * @param v the destination node
-     *********************************************************/
-    // public void printOptimalRouteInfo(int u, int v) { 
-    //     if (u > numNodes || v > numNodes) {
-    //         System.out.println("u or v is not a node.");
-    //         return;
-    //     }
+        while (!recontructedPath.isEmpty()) { 
+            System.out.print(recontructedPath.pop());
+            if (!recontructedPath.isEmpty())
+                System.out.print(" -> ");
+        }
+        System.out.println();
+    }
 
-    //     // int optimalDistance = distAndParents.get(u).get(0)[v];
-    //     // int[] parents = distAndParents.get(u).get(1); // get the list of parents TO node u
-    //     int parent = v;
 
-    //     Deque<Integer> stack = new ArrayDeque<>();
 
-    //     int i = 0;
-    //     for (; i < parents.length; i++) {
-    //         stack.push(parent);
-    //         if (parents[parent] != -1) { 
-    //             parent = parents[parent];
-    //         } else {
-    //             i = parents.length;
-    //         }
-    //     }
-
-    //     System.out.println("Optimal distance: " + optimalDistance);
-    //     System.out.print("Optimal path:     ");
-
-    //     while (!stack.isEmpty()) { 
-    //         System.out.print(stack.pop());
-    //         if (!stack.isEmpty())
-    //             System.out.print(" -> ");
-    //     }
-    //     System.out.println();
-    // }
 
 
 
@@ -225,8 +241,22 @@ public class FloydsClass {
             }
         }
 
+        // Ensure maxWidth is at least 1 (important when all entries are -1)
+        if (maxWidth == 0) {
+            maxWidth = 1;
+        }
+
+        // Print the vertex numbers
+        System.out.print("  ");
+        for (int i = 0; i < arr.length; i++) {
+            System.out.printf("%" + maxWidth + "d ", i);
+        }
+        System.out.println();
+        
         // Print each row using padding
+        int rowIndex = 0;
         for (int[] row : arr) {
+            System.out.printf("%" + 1 + "d ", rowIndex); // prints the row numbers
             for (int val : row) {
                 if (val == -1) {
                     // print blank representing no path
@@ -236,8 +266,24 @@ public class FloydsClass {
                 }
             }
             System.out.println();
+            rowIndex++;
         }
         System.out.println();
+    }
+
+
+
+    public static int[][] deepCopy(int[][] original) {
+        if (original == null) 
+            return null;
+
+        int[][] copy = new int[original.length][];
+
+        for (int i = 0; i < original.length; i++) {
+            // Copy each row (creates a new array, not a reference!)
+            copy[i] = original[i].clone();
+        }
+        return copy;
     }
 
 
