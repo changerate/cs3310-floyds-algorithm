@@ -1,0 +1,6 @@
+My function implements Floyd’s algorithm recursively in order to find and calculate the optimal costs between posts. This algorithm checks through each edge in the matrix and evaluates whether there is an existing edge that has a smaller distance than the current distance. If the distance IS smaller, then it updates the weight of that edge, as well as updating the parents matrix to include the inbetween edge as a parent / ancestor of that vertex.
+
+Essentially, instead of using nested loops in this function it uses recursion to call the next iteration. 
+
+For the runtime, there are three things to consider combining. We need to pair every intermediate node, k, with every source node, i, and every destination node, j. This means that for each of this we need to run n times, where n is the number of nodes in the graph. 
+Leaving us with a theoretical runtime of O(n^3).
