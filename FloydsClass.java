@@ -76,20 +76,47 @@ public class FloydsClass {
             }
         }
 
-        for (int k = 0; k < n; k++) {
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    // Skip if i can't reach k or k can't reach j
-                    if (shortestPaths[i][k] == -1 || shortestPaths[k][j] == -1) continue;
+        floydRecursive(0, 0, 0);
+    }
 
-                    int ikjDist = shortestPaths[i][k] + shortestPaths[k][j];
-                    if (ikjDist < shortestPaths[i][j]) {
-                        shortestPaths[i][j] = ikjDist;
-                        parentsMatrix[i][j] = parentsMatrix[i][k];
-                    }
-                }
+
+
+    /*********************************************************
+     * Function floydRecursive; recursive helper 
+     * @param k current in between index
+     * @param i current source node index
+     * @param j current destination node index
+     *********************************************************/
+    private void floydRecursive(int k, int i, int j) {
+        // the base case is finished all intermediate verteces
+        if (k == numNodes) return;
+
+        // move to next i (row)
+        if (j == numNodes) {
+            floydRecursive(k, i + 1, 0);
+            return;
+        }
+
+        // move to next k
+        if (i == numNodes) {
+            floydRecursive(k + 1, 0, 0);
+            return;
+        }
+
+        // Skip if i can't reach k or k can't reach j
+        if (shortestPaths[i][k] != -1 && shortestPaths[k][j] != -1) {
+            int ikjDist = shortestPaths[i][k] + shortestPaths[k][j];
+            
+            if (shortestPaths[i][j] == -1 || ikjDist < shortestPaths[i][j]) {
+                // take this path if there is even an intermediate path that exists,
+                // but the original path does not
+                shortestPaths[i][j] = ikjDist;
+                parentsMatrix[i][j] = parentsMatrix[i][k];
             }
         }
+
+        // move to next j
+        floydRecursive(k, i, j + 1);
     }
 
 
